@@ -47,7 +47,7 @@ export const artists = [
     },
     {
         name: "ghostbow",
-        description: "Multi instrumental, genre hopping beats that will haunt you",
+        description: "Multi instrumentalist, genre hopping beats that will haunt you",
         image: `${config.publicUrl}/images/ghostbow.jpeg`,
         soundcloud: "https://soundcloud.com/jeffwestcott",
     },
