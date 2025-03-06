@@ -47,8 +47,8 @@ export const artists = [
     },
     {
         name: "ghostbow",
-        description: "",
-        image: "https://picsum.photos/seed/artist7/150",
+        description: "Multi instrumental, genre hopping beats that will haunt you",
+        image: `${config.publicUrl}/images/ghostbow.jpeg`,
         soundcloud: "https://soundcloud.com/jeffwestcott",
     },
     {
@@ -59,7 +59,8 @@ export const artists = [
 
 ];
 
-function Artists() {
+
+export default function Artists() {
     return (
         <section>
             <div className="artist-list">
@@ -88,4 +89,3 @@ function Artists() {
     );
 }
 
-export default Artists; 
