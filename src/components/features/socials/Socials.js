@@ -10,7 +10,7 @@ function Socials() {
             <div className="artist-list">
                 <div className="artist-row left">
                     <div className="artist-image-container">
-                        <a href="https://www.instagram.com/wildflowerartsco"><img src={`${config.publicUrl}/images/instagramlogo.png`} alt="Instagram" className="artist-image" /></a>
+                        <a href="https://www.instagram.com/wildflowerartsco"><img src="/images/instagramlogo.png" alt="Instagram" className="artist-image" /></a>
                     </div>
                     <div className="artist-info">
                         <div className="artist-name">Instagram</div>

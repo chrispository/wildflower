@@ -51,10 +51,10 @@ console.log('Build path:', path.join(__dirname, 'build'));
 console.log('Build directory contents:', fs.readdirSync(path.join(__dirname, 'build')));
 
 // Serve static files from /j7qf5y/wf path
-app.use('/j7qf5y/wf', express.static(path.join(__dirname, 'build')));
+app.use('/', express.static(path.join(__dirname, 'build')));
 
 // Handle all routes under /j7qf5y/wf
-app.get('/j7qf5y/wf/*', function (req, res) {
+app.get('/*', function (req, res) {
     const indexPath = path.join(__dirname, 'build', 'index.html');
     console.log('Attempting to serve:', indexPath);
     
