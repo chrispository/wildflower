@@ -46,8 +46,8 @@ export const artists = [
     },
     {
         name: "ghostbow",
-        description: "",
-        image: "https://picsum.photos/seed/artist7/150",
+        description: "Multi instrumentalist, genre hopping beats that will haunt you.",
+        image: "/images/artist_ghostbow.jpg",
         soundcloud: "https://soundcloud.com/jeffwestcott",
     },
     {
