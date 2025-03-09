@@ -74,7 +74,7 @@ nav ul li button:hover {
   font-size: 24px;
   animation: float 4s ease-in-out infinite;
   filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
-  top: 50%;
+  top: 33%;
   transform: translateY(-50%);
   opacity: 0.9;
 }
@@ -102,6 +102,31 @@ nav ul li button:hover {
 .flower:nth-child(5) { 
   left: 90%;
   animation-delay: -5s;
+}
+
+/* Add media query for mobile devices */
+@media (max-width: 768px) {
+  .flower {
+    /* Adjust font size for smaller screens */
+    font-size: 20px;
+  }
+  
+  /* Adjust positioning for better spacing on mobile */
+  .flower:nth-child(1) { left: 5%; }
+  .flower:nth-child(2) { left: 25%; }
+  .flower:nth-child(3) { left: 50%; transform: translate(-50%, -50%); } /* Center the middle flower */
+  .flower:nth-child(4) { left: 75%; }
+  .flower:nth-child(5) { left: 95%; }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+  /* Further adjustments for very small screens */
+  .flower:nth-child(1) { left: 10%; }
+  .flower:nth-child(2) { left: 30%; }
+  .flower:nth-child(3) { left: 50%; transform: translate(-50%, -50%); }
+  .flower:nth-child(4) { left: 70%; }
+  .flower:nth-child(5) { left: 90%; }
 }
 
 .nav-links a {
