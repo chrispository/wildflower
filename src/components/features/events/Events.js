@@ -3,22 +3,14 @@ import './Events.css';
 import { formatDateWithDay } from '../../../utils/dateFormatters';
 
 export const events = [
-    {
-        name: "Grow Room Monthly Showcase",
-        date: "March 22, 2025",
-        time: "9:00 PM - 1:00 AM",
-        description: "Our monthly curated showcase of local artists, producers, and DJs.",
-        location: "The Lounge",
-        flyer: `/images/mar22lounge.png`,
-        ticketLink: "https://blackboxdenver.co/events/wildflower-arts-mar22"
-    },
+
     {
         name: "Grow Room Monthly Showcase",
         date: "April 26, 2025",
         time: "9:00 PM - 1:00 AM",
         description: "Our monthly curated showcase of local artists, producers, and DJs.",
         location: "The Lounge ",
-        flyer: `/images/feb15thlounge.png`,
+        flyer: `/images/apr26lounge.png`,
         ticketLink: "https://blackboxdenver.co/events/wildflower-arts-feb15"
     }
     ];
