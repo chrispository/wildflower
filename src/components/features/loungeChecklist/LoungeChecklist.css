@@ -1,0 +1,447 @@
+.checklist-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.checklist-container h2 {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 300;
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.checklist-description {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.add-task-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.task-input, .deadline-input, .time-select, .edit-task-input, .edit-deadline-input, .edit-time-select {
+    padding: 12px;
+    border: 2px solid var(--accent-color);
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    flex: 1;
+    min-width: 200px;
+}
+
+.time-select, .edit-time-select {
+    min-width: 120px;
+    flex: 0.5;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23778DA9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.time-select option, .edit-time-select option {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.add-task-button {
+    padding: 12px 24px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.add-task-button:hover {
+    background-color: transparent;
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+}
+
+.add-artist-button {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.add-artist-button:hover {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+/* Edit task form */
+.edit-task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.edit-task-date-time {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 5px;
+}
+
+.save-button, .cancel-button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-button {
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    border: none;
+}
+
+.save-button:hover {
+    background-color: var(--text-color);
+}
+
+.cancel-button {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--accent-color);
+}
+
+.cancel-button:hover {
+    background-color: rgba(119, 141, 169, 0.1);
+}
+
+/* Artist Contacts Section */
+.artist-contacts-section {
+    margin-bottom: 20px;
+    border: 2px solid var(--accent-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--secondary-color);
+}
+
+.artist-section-header {
+    padding: 12px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary-color);
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.artist-section-header:hover {
+    background-color: rgba(119, 141, 169, 0.1);
+}
+
+.artist-section-header h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-color);
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.artist-section-content {
+    padding: 15px;
+    border-top: 1px solid var(--accent-color);
+}
+
+.add-artist-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.artist-input {
+    padding: 12px;
+    border: 2px solid var(--accent-color);
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    flex: 1;
+    min-width: 200px;
+}
+
+.copy-message {
+    display: none;
+}
+
+.artist-stage-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 3px;
+}
+
+.artist-real-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    color: var(--accent-color);
+    margin-bottom: 6px;
+    font-style: italic;
+}
+
+.artists-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.artist-card {
+    background-color: var(--secondary-color);
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid var(--accent-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.artist-info {
+    flex: 1;
+}
+
+.artist-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 4px;
+}
+
+.artist-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.artist-contact {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--accent-color);
+    flex: 1;
+}
+
+.contact-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.copy-button, .text-button {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 2px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.copy-button:hover, .text-button:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.empty-artists {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--accent-color);
+    text-align: center;
+    padding: 15px;
+    border: 1px dashed var(--accent-color);
+    border-radius: 6px;
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-card {
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 2px solid var(--accent-color);
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+}
+
+.task-card::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: -6px;
+    bottom: -6px;
+    background: var(--accent-color);
+    z-index: -1;
+    transform: skew(-2deg, 2deg);
+}
+
+.task-card.completed {
+    opacity: 0.7;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+
+.task-card.completed::before {
+    opacity: 0.5;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.task-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+}
+
+.checkbox-container label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.completed-text {
+    text-decoration: line-through;
+    color: var(--accent-color);
+}
+
+.delete-button, .edit-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-button {
+    color: var(--accent-color);
+    padding: 0 5px;
+}
+
+.edit-button {
+    color: var(--accent-color);
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.delete-button:hover {
+    color: #ff6b6b;
+    transform: scale(1.2);
+}
+
+.edit-button:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.task-deadline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--accent-color);
+    margin-top: 8px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: var(--accent-color);
+    font-family: 'Space Grotesk', sans-serif;
+    border: 2px dashed var(--accent-color);
+    border-radius: 8px;
+}
+
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.notification-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+} 
