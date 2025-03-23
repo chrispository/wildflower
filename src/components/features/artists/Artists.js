@@ -50,11 +50,6 @@ export const artists = [
         image: "/images/artist_ghostbow.jpg",
         soundcloud: "https://soundcloud.com/jeffwestcott",
     },
-    {
-        name: "spru",
-        description: "",
-        image: "https://picsum.photos/seed/artist8/150",
-    },
 
 ];
 
