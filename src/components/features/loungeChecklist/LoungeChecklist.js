@@ -254,7 +254,7 @@ function LoungeChecklist() {
                     className="artist-section-header"
                     onClick={() => setIsArtistSectionExpanded(!isArtistSectionExpanded)}
                 >
-                    <h3>Artist Contacts {isArtistSectionExpanded ? '▼' : '▶'}</h3>
+                    <h3>Artist Contacts {isArtistSectionExpanded ? '-' : '+'}</h3>
                 </div>
                 
                 {isArtistSectionExpanded && (

@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lounge Checklist - Wildflower Arts Collective</title>
+    <!-- Include React and React DOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Include Babel for JSX support -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #0D1B2A;
+            --secondary-color: #1B263B;
+            --text-color: #E0E1DD;
+            --accent-color: #778DA9;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Roboto+Condensed:wght@300;400;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        /* Checklist Title */
+        .checklist-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 500;
+            font-size: 24px;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Lounge Checklist Styles */
+        .checklist-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .add-task-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .task-input, .deadline-input, .time-select, .edit-task-input, .edit-deadline-input, .edit-time-select {
+            padding: 12px;
+            border: 2px solid var(--accent-color);
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Custom styling for date input to match website colors */
+        input[type="date"] {
+            font-family: 'Space Grotesk', sans-serif !important;
+            color: var(--text-color) !important;
+            appearance: none;
+        }
+
+        /* Apply consistent styling to selects and their options */
+        select, select option {
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+
+        select:focus {
+            font-family: 'Space Grotesk', sans-serif !important;
+            color: var(--text-color);
+        }
+
+        /* Style the calendar dropdown for date inputs */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        input[type="date"]::-webkit-datetime-edit {
+            color: var(--text-color);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+            color: var(--text-color);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* For Firefox */
+        @-moz-document url-prefix() {
+            select, input[type="date"] {
+                font-family: 'Space Grotesk', sans-serif !important;
+                color: var(--text-color);
+            }
+        }
+
+        .time-select, .edit-time-select {
+            min-width: 120px;
+            flex: 0.5;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23778DA9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .time-select option, .edit-time-select option {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .add-task-button {
+            padding: 12px 24px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .add-task-button:hover {
+            background-color: transparent;
+            outline: 2px solid var(--accent-color);
+            outline-offset: 3px;
+        }
+
+        .add-artist-button {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .add-artist-button:hover {
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        /* Edit task form */
+        .edit-task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px 0;
+        }
+
+        .edit-task-date-time {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 5px;
+        }
+
+        .save-button, .cancel-button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .save-button {
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            border: none;
+        }
+
+        .save-button:hover {
+            background-color: var(--text-color);
+        }
+
+        .cancel-button {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--accent-color);
+        }
+
+        .cancel-button:hover {
+            background-color: rgba(119, 141, 169, 0.1);
+        }
+
+        /* Artist and Guestlist Contacts Sections */
+        .artist-contacts-section {
+            margin-bottom: 20px;
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--secondary-color);
+        }
+
+        .artist-section-header {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background-color: var(--secondary-color);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .artist-section-header:hover {
+            background-color: rgba(119, 141, 169, 0.1);
+        }
+
+        .artist-section-header h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .artist-section-content {
+            padding: 15px;
+            border-top: 1px solid var(--accent-color);
+        }
+
+        .add-artist-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .artist-input {
+            padding: 12px;
+            border: 2px solid var(--accent-color);
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .copy-message {
+            display: none;
+        }
+
+        .artist-stage-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 3px;
+        }
+
+        .artist-real-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+            font-style: italic;
+        }
+
+        .artists-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .artist-card {
+            background-color: var(--secondary-color);
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .artist-info {
+            flex: 1;
+        }
+
+        .artist-contact-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 2px;
+        }
+
+        .artist-contact {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .copy-button, .text-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .copy-button:hover, .text-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .delete-button {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 2px;
+        }
+
+        .delete-button:hover {
+            color: #e76f51;
+            transform: scale(1.1);
+        }
+
+        .empty-artists {
+            text-align: center;
+            padding: 15px;
+            background-color: rgba(119, 141, 169, 0.1);
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-color);
+        }
+
+        /* Tasks list styles */
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-card {
+            background-color: var(--secondary-color);
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid var(--accent-color);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .checkbox-container input[type=checkbox] {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+
+        .checkbox-container label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .completed-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .task-deadline {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--accent-color);
+            margin-top: 4px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .edit-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+
+        .edit-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .task-card.completed {
+            background-color: rgba(27, 38, 59, 0.7);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 15px;
+            background-color: rgba(119, 141, 169, 0.1);
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-color);
+        }
+
+        /* Compose email and text section styles */
+        .compose-section {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .compose-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .compose-option label {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .compose-button {
+            padding: 12px 24px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .compose-button:hover {
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+        }
+
+        .compose-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            border-color: var(--accent-color);
+        }
+
+        .compose-button:disabled:hover {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .compose-button-icon {
+            font-size: 18px;
+        }
+
+        .artist-section-actions {
+            display: flex;
+            width: 100%;
+            padding: 15px 0 0;
+            margin-top: 10px;
+            border-top: 1px solid rgba(119, 141, 169, 0.3);
+        }
+
+        .artist-section-actions .compose-button {
+            width: 100%;
+        }
+
+        /* Notification toast */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            border-left: 4px solid var(--accent-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification-toast.visible {
+            transform: translateX(0);
+        }
+
+        /* Home link */
+        .home-link {
+            display: block;
+            text-align: center;
+            margin: 20px auto;
+            color: var(--accent-color);
+            font-family: 'Space Grotesk', sans-serif;
+            text-decoration: none;
+        }
+
+        .home-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const App = () => {
+            const [tasks, setTasks] = useState(() => {
+                const savedTasks = localStorage.getItem('loungeChecklist');
+                return savedTasks ? JSON.parse(savedTasks) : [];
+            });
+            
+            const [artists, setArtists] = useState(() => {
+                const savedArtists = localStorage.getItem('loungeArtists');
+                return savedArtists ? JSON.parse(savedArtists) : [];
+            });
+            
+            const [guestlist, setGuestlist] = useState(() => {
+                const savedGuestlist = localStorage.getItem('loungeGuestlist');
+                return savedGuestlist ? JSON.parse(savedGuestlist) : [];
+            });
+            
+            const [newTask, setNewTask] = useState('');
+            const [newDeadline, setNewDeadline] = useState('');
+            const [newTime, setNewTime] = useState('09:00');
+            const [isArtistSectionExpanded, setIsArtistSectionExpanded] = useState(false);
+            const [isGuestlistSectionExpanded, setIsGuestlistSectionExpanded] = useState(false);
+            const [newArtistRealName, setNewArtistRealName] = useState('');
+            const [newArtistStageName, setNewArtistStageName] = useState('');
+            const [newArtistContact, setNewArtistContact] = useState('');
+            const [newGuestlistName, setNewGuestlistName] = useState('');
+            const [newGuestlistOf, setNewGuestlistOf] = useState('');
+            const [newGuestlistContact, setNewGuestlistContact] = useState('');
+            const [includeArtistsInEmail, setIncludeArtistsInEmail] = useState(true);
+            const [copyMessage, setCopyMessage] = useState('');
+            const [copyNotificationVisible, setCopyNotificationVisible] = useState(false);
+            const [editingTaskId, setEditingTaskId] = useState(null);
+            const [editTaskText, setEditTaskText] = useState('');
+            const [editTaskDeadline, setEditTaskDeadline] = useState('');
+            const [editTaskTime, setEditTaskTime] = useState('');
+            
+            useEffect(() => {
+                localStorage.setItem('loungeChecklist', JSON.stringify(tasks));
+            }, [tasks]);
+            
+            useEffect(() => {
+                localStorage.setItem('loungeArtists', JSON.stringify(artists));
+            }, [artists]);
+            
+            useEffect(() => {
+                localStorage.setItem('loungeGuestlist', JSON.stringify(guestlist));
+            }, [guestlist]);
+            
+            // Clear copy message after 2 seconds
+            useEffect(() => {
+                if (copyMessage) {
+                    setCopyNotificationVisible(true);
+                    const timer = setTimeout(() => {
+                        setCopyNotificationVisible(false);
+                        setTimeout(() => {
+                            setCopyMessage('');
+                        }, 300); // Wait for fade out animation to complete
+                    }, 2000);
+                    return () => clearTimeout(timer);
+                }
+            }, [copyMessage]);
+            
+            const addTask = () => {
+                if (newTask.trim() === '' || !newDeadline) return;
+                
+                const task = {
+                    id: Date.now(),
+                    text: newTask,
+                    deadline: newDeadline,
+                    time: newTime,
+                    completed: false
+                };
+                
+                setTasks([...tasks, task]);
+                setNewTask('');
+                setNewDeadline('');
+                setNewTime('09:00');
+            };
+            
+            const toggleComplete = (id) => {
+                setTasks(tasks.map(task => 
+                    task.id === id ? { ...task, completed: !task.completed } : task
+                ));
+            };
+            
+            const removeTask = (id) => {
+                setTasks(tasks.filter(task => task.id !== id));
+            };
+            
+            const startEditingTask = (task) => {
+                setEditingTaskId(task.id);
+                setEditTaskText(task.text);
+                setEditTaskDeadline(task.deadline);
+                setEditTaskTime(task.time);
+            };
+            
+            const saveEditedTask = () => {
+                if (editTaskText.trim() === '' || !editTaskDeadline) return;
+                
+                setTasks(tasks.map(task => 
+                    task.id === editingTaskId 
+                        ? { ...task, text: editTaskText, deadline: editTaskDeadline, time: editTaskTime }
+                        : task
+                ));
+                
+                // Reset editing state
+                setEditingTaskId(null);
+                setEditTaskText('');
+                setEditTaskDeadline('');
+                setEditTaskTime('');
+            };
+            
+            const cancelEditing = () => {
+                setEditingTaskId(null);
+                setEditTaskText('');
+                setEditTaskDeadline('');
+                setEditTaskTime('');
+            };
+            
+            // Function to format phone number
+            const formatPhoneNumber = (phoneNumberString) => {
+                // Strip all non-numeric characters
+                let cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+                
+                // Remove leading "1" if present (country code)
+                if (cleaned.length > 10 && cleaned.charAt(0) === '1') {
+                    cleaned = cleaned.substring(1);
+                }
+                
+                // Check if the number is valid (10 digits for US phone)
+                const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+                
+                if (match) {
+                    return `${match[1]}-${match[2]}-${match[3]}`;
+                }
+                
+                // If not a valid 10-digit number, return the original input
+                return phoneNumberString;
+            };
+            
+            // Check if string is likely a phone number
+            const isLikelyPhoneNumber = (str) => {
+                // Remove all non-numeric characters
+                const digitsOnly = str.replace(/\D/g, '');
+                // Check if we have 10-11 digits (with optional country code)
+                return digitsOnly.length >= 10 && digitsOnly.length <= 11;
+            };
+            
+            const addArtist = () => {
+                if (newArtistRealName.trim() === '' && newArtistStageName.trim() === '') return;
+                
+                // Format contact if it looks like a phone number
+                const formattedContact = isLikelyPhoneNumber(newArtistContact) 
+                    ? formatPhoneNumber(newArtistContact)
+                    : newArtistContact;
+                    
+                const artist = {
+                    id: Date.now(),
+                    realName: newArtistRealName,
+                    stageName: newArtistStageName,
+                    contact: formattedContact
+                };
+                
+                setArtists([...artists, artist]);
+                setNewArtistRealName('');
+                setNewArtistStageName('');
+                setNewArtistContact('');
+            };
+            
+            const addGuestlist = () => {
+                if (newGuestlistName.trim() === '' && newGuestlistOf.trim() === '') return;
+                
+                // Format contact if it looks like a phone number
+                const formattedContact = isLikelyPhoneNumber(newGuestlistContact) 
+                    ? formatPhoneNumber(newGuestlistContact)
+                    : newGuestlistContact;
+                    
+                const guest = {
+                    id: Date.now(),
+                    realName: newGuestlistName,
+                    friendOf: newGuestlistOf,
+                    contact: formattedContact
+                };
+                
+                setGuestlist([...guestlist, guest]);
+                setNewGuestlistName('');
+                setNewGuestlistOf('');
+                setNewGuestlistContact('');
+            };
+            
+            const removeArtist = (id) => {
+                setArtists(artists.filter(artist => artist.id !== id));
+            };
+            
+            const removeGuestlist = (id) => {
+                setGuestlist(guestlist.filter(guest => guest.id !== id));
+            };
+            
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        setCopyMessage('Number copied to clipboard');
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        setCopyMessage('Copy failed');
+                    });
+            };
+            
+            const composeGroupText = () => {
+                // Filter artists with valid phone numbers
+                const phoneNumbers = artists
+                    .map(artist => artist.contact)
+                    .filter(contact => isLikelyPhoneNumber(contact))
+                    .map(contact => contact.replace(/\D/g, '')); // Remove non-digits for sms compatibility
+                
+                if (phoneNumbers.length === 0) {
+                    setCopyMessage('No phone numbers found');
+                    return;
+                }
+                
+                // Create sms link with all numbers
+                const smsLink = `sms:${phoneNumbers.join(',')}`;
+                window.location.href = smsLink;
+            };
+            
+            const composeEmail = () => {
+                let emailBody = '';
+                let subject = 'Wildflower Arts Collective - Lounge Information';
+                
+                // Add guestlist table
+                if (guestlist.length > 0) {
+                    emailBody += '<h2>Guestlist</h2>';
+                    emailBody += '<table border="1" cellpadding="5" style="border-collapse: collapse;">';
+                    emailBody += '<tr><th>Name</th><th>Guest Of</th><th>Contact</th></tr>';
+                    
+                    guestlist.forEach(guest => {
+                        emailBody += '<tr>';
+                        emailBody += `<td>${guest.realName || 'N/A'}</td>`;
+                        emailBody += `<td>${guest.friendOf || 'N/A'}</td>`;
+                        emailBody += `<td>${guest.contact || 'N/A'}</td>`;
+                        emailBody += '</tr>';
+                    });
+                    
+                    emailBody += '</table><br><br>';
+                }
+                
+                // Add artists table if checkbox is selected
+                if (includeArtistsInEmail && artists.length > 0) {
+                    emailBody += '<h2>Artists</h2>';
+                    emailBody += '<table border="1" cellpadding="5" style="border-collapse: collapse;">';
+                    emailBody += '<tr><th>Artist</th><th>Name</th><th>Contact</th></tr>';
+                    
+                    artists.forEach(artist => {
+                        emailBody += '<tr>';
+                        emailBody += `<td>${artist.stageName || 'N/A'}</td>`;
+                        emailBody += `<td>${artist.realName || 'N/A'}</td>`;
+                        emailBody += `<td>${artist.contact || 'N/A'}</td>`;
+                        emailBody += '</tr>';
+                    });
+                    
+                    emailBody += '</table>';
+                }
+                
+                // If no data to send
+                if (emailBody === '') {
+                    setCopyMessage('No contacts to include in email');
+                    return;
+                }
+                
+                // Create mailto link
+                const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+                window.location.href = mailtoLink;
+            };
+            
+            // Sort tasks by deadline (closest first)
+            const sortedTasks = [...tasks].sort((a, b) => {
+                // Create dates without timezone conversion issues
+                const [yearA, monthA, dayA] = a.deadline.split('-').map(Number);
+                const [hoursA, minutesA] = a.time.split(':').map(Number);
+                
+                const [yearB, monthB, dayB] = b.deadline.split('-').map(Number);
+                const [hoursB, minutesB] = b.time.split(':').map(Number);
+                
+                // Create date objects (months are 0-indexed in JS)
+                const dateA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA);
+                const dateB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB);
+                
+                return dateA - dateB;
+            });
+            
+            // Format time to display in AM/PM format
+            const formatTimeDisplay = (time) => {
+                switch(time) {
+                    case '09:00': return '9:00am';
+                    case '12:00': return '12:00pm';
+                    case '18:00': return '6:00pm';
+                    default: return time;
+                }
+            };
+            
+            // Format date correctly without timezone issues
+            const formatDeadlineDate = (dateString) => {
+                const [year, month, day] = dateString.split('-').map(Number);
+                // Create a date object using local time values to avoid timezone shift
+                const date = new Date(year, month - 1, day);
+                
+                return date.toLocaleDateString('en-US', { 
+                    weekday: 'long',
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+            };
+            
+            return (
+                <section className="checklist-container">
+                    {copyMessage && (
+                        <div className={`notification-toast ${copyNotificationVisible ? 'visible' : ''}`}>
+                            {copyMessage}
+                        </div>
+                    )}
+                    
+                    <h1 className="checklist-title">Lounge Checklist</h1>
+                    
+                    <div className="add-task-form">
+                        <input
+                            type="text"
+                            placeholder="Add a new task..."
+                            value={newTask}
+                            onChange={(e) => setNewTask(e.target.value)}
+                            className="task-input"
+                        />
+                        <input
+                            type="date"
+                            value={newDeadline}
+                            onChange={(e) => setNewDeadline(e.target.value)}
+                            className="deadline-input"
+                        />
+                        <select
+                            value={newTime}
+                            onChange={(e) => setNewTime(e.target.value)}
+                            className="time-select"
+                        >
+                            <option value="09:00">9:00am</option>
+                            <option value="12:00">12:00pm</option>
+                            <option value="18:00">6:00pm</option>
+                        </select>
+                        <button onClick={addTask} className="add-task-button">Add Task</button>
+                    </div>
+                    
+                    <div className="artist-contacts-section">
+                        <div 
+                            className="artist-section-header"
+                            onClick={() => setIsArtistSectionExpanded(!isArtistSectionExpanded)}
+                        >
+                            <h3>Artist Contacts {isArtistSectionExpanded ? '-' : '+'}</h3>
+                        </div>
+                        
+                        {isArtistSectionExpanded && (
+                            <div className="artist-section-content">
+                                <div className="add-artist-form">
+                                    <input
+                                        type="text"
+                                        placeholder="Firstname Lastname..."
+                                        value={newArtistRealName}
+                                        onChange={(e) => setNewArtistRealName(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addArtist()}
+                                        className="artist-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Stage Name..."
+                                        value={newArtistStageName}
+                                        onChange={(e) => setNewArtistStageName(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addArtist()}
+                                        className="artist-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Contact info (phone, email, etc.)..."
+                                        value={newArtistContact}
+                                        onChange={(e) => setNewArtistContact(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addArtist()}
+                                        className="artist-input"
+                                    />
+                                    <button onClick={addArtist} className="add-artist-button" aria-label="Add Contact">+</button>
+                                </div>
+                                
+                                <div className="artists-list">
+                                    {artists.length === 0 ? (
+                                        <div className="empty-artists">
+                                            No artist contacts yet. Add contacts above.
+                                        </div>
+                                    ) : (
+                                        artists.map(artist => (
+                                            <div key={artist.id} className="artist-card">
+                                                <div className="artist-info">
+                                                    {artist.stageName && (
+                                                        <div className="artist-stage-name">{artist.stageName}</div>
+                                                    )}
+                                                    {artist.realName && (
+                                                        <div className="artist-real-name">{artist.realName}</div>
+                                                    )}
+                                                    <div className="artist-contact-row">
+                                                        <div className="artist-contact">{artist.contact}</div>
+                                                        <div className="contact-actions">
+                                                            <button 
+                                                                onClick={() => copyToClipboard(artist.contact)}
+                                                                className="copy-button"
+                                                                aria-label="Copy contact information"
+                                                            >
+                                                                📋
+                                                            </button>
+                                                            <a 
+                                                                href={`sms:${artist.contact}`}
+                                                                className="text-button"
+                                                                aria-label="Send text message"
+                                                            >
+                                                                💬
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    onClick={() => removeArtist(artist.id)}
+                                                    className="delete-button"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                                
+                                <div className="artist-section-actions">
+                                    <button className="compose-button" onClick={composeGroupText} disabled={artists.length === 0}>
+                                        <span className="compose-button-icon">💬</span> Compose Group Text
+                                        {artists.length === 0 ? " (Add artists first)" : ""}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="artist-contacts-section">
+                        <div 
+                            className="artist-section-header"
+                            onClick={() => setIsGuestlistSectionExpanded(!isGuestlistSectionExpanded)}
+                        >
+                            <h3>Guestlist {isGuestlistSectionExpanded ? '-' : '+'}</h3>
+                        </div>
+                        
+                        {isGuestlistSectionExpanded && (
+                            <div className="artist-section-content">
+                                <div className="add-artist-form">
+                                    <input
+                                        type="text"
+                                        placeholder="First and last name"
+                                        value={newGuestlistName}
+                                        onChange={(e) => setNewGuestlistName(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addGuestlist()}
+                                        className="artist-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="(Optional) Guest of..."
+                                        value={newGuestlistOf}
+                                        onChange={(e) => setNewGuestlistOf(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addGuestlist()}
+                                        className="artist-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="(Optional) Contact info (phone, email, etc.)..."
+                                        value={newGuestlistContact}
+                                        onChange={(e) => setNewGuestlistContact(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addGuestlist()}
+                                        className="artist-input"
+                                    />
+                                    <button onClick={addGuestlist} className="add-artist-button" aria-label="Add Contact">+</button>
+                                </div>
+                                
+                                <div className="artists-list">
+                                    {guestlist.length === 0 ? (
+                                        <div className="empty-artists">
+                                            No guestlist contacts yet. Add contacts above.
+                                        </div>
+                                    ) : (
+                                        guestlist.map(guest => (
+                                            <div key={guest.id} className="artist-card">
+                                                <div className="artist-info">
+                                                    {guest.friendOf && (
+                                                        <div className="artist-stage-name">Guest of: {guest.friendOf}</div>
+                                                    )}
+                                                    {guest.realName && (
+                                                        <div className="artist-real-name">{guest.realName}</div>
+                                                    )}
+                                                    <div className="artist-contact-row">
+                                                        <div className="artist-contact">{guest.contact}</div>
+                                                        <div className="contact-actions">
+                                                            <button 
+                                                                onClick={() => copyToClipboard(guest.contact)}
+                                                                className="copy-button"
+                                                                aria-label="Copy contact information"
+                                                            >
+                                                                📋
+                                                            </button>
+                                                            <a 
+                                                                href={`sms:${guest.contact}`}
+                                                                className="text-button"
+                                                                aria-label="Send text message"
+                                                            >
+                                                                💬
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    onClick={() => removeGuestlist(guest.id)}
+                                                    className="delete-button"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                                
+                                <div className="compose-section">
+                                    <div className="compose-option">
+                                        <input 
+                                            type="checkbox" 
+                                            id="include-artists" 
+                                            checked={includeArtistsInEmail}
+                                            onChange={(e) => setIncludeArtistsInEmail(e.target.checked)}
+                                        />
+                                        <label htmlFor="include-artists">Include artists in guestlist email</label>
+                                    </div>
+                                    <button className="compose-button" onClick={composeEmail}>
+                                        <span className="compose-button-icon">✉️</span> Compose Email
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="tasks-list">
+                        {sortedTasks.length === 0 ? (
+                            <div className="empty-state">
+                                No tasks yet. Add tasks to organize your show prep!
+                            </div>
+                        ) : (
+                            sortedTasks.map(task => (
+                                <div 
+                                    key={task.id} 
+                                    className={`task-card ${task.completed ? 'completed' : ''}`}
+                                >
+                                    {editingTaskId === task.id ? (
+                                        <div className="edit-task-form">
+                                            <input
+                                                type="text"
+                                                value={editTaskText}
+                                                onChange={(e) => setEditTaskText(e.target.value)}
+                                                className="edit-task-input"
+                                            />
+                                            <div className="edit-task-date-time">
+                                                <input
+                                                    type="date"
+                                                    value={editTaskDeadline}
+                                                    onChange={(e) => setEditTaskDeadline(e.target.value)}
+                                                    className="edit-deadline-input"
+                                                />
+                                                <select
+                                                    value={editTaskTime}
+                                                    onChange={(e) => setEditTaskTime(e.target.value)}
+                                                    className="edit-time-select"
+                                                >
+                                                    <option value="09:00">9:00am</option>
+                                                    <option value="12:00">12:00pm</option>
+                                                    <option value="18:00">6:00pm</option>
+                                                </select>
+                                            </div>
+                                            <div className="edit-actions">
+                                                <button onClick={saveEditedTask} className="save-button">Save</button>
+                                                <button onClick={cancelEditing} className="cancel-button">Cancel</button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="task-header">
+                                                <div className="checkbox-container">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={task.completed}
+                                                        onChange={() => toggleComplete(task.id)}
+                                                        id={`task-${task.id}`}
+                                                    />
+                                                    <label 
+                                                        htmlFor={`task-${task.id}`}
+                                                        className={task.completed ? 'completed-text' : ''}
+                                                    >
+                                                        {task.text}
+                                                    </label>
+                                                </div>
+                                                <div className="task-actions">
+                                                    <button 
+                                                        onClick={() => startEditingTask(task)}
+                                                        className="edit-button"
+                                                        aria-label="Edit task"
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => removeTask(task.id)}
+                                                        className="delete-button"
+                                                        aria-label="Delete task"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="task-deadline">
+                                                Deadline: {formatDeadlineDate(task.deadline)} at {formatTimeDisplay(task.time)}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                    
+                    <a href="/" className="home-link">Back to Wildflower Arts Collective</a>
+                </section>
+            );
+        };
+        
+        // Import React hooks
+        const { useState, useEffect } = React;
+        
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html> 
