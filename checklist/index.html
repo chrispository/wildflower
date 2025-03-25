@@ -675,6 +675,27 @@
             text-decoration: none;
             margin-left: -5%;
         }
+
+        /* Add CSS for social media link */
+        .artist-social {
+            margin-top: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+        }
+        
+        .social-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .social-link:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -683,10 +704,7 @@
     <script type="text/babel">
         const App = () => {
             const [tasks, setTasks] = useState([]);
-            const [artists, setArtists] = useState(() => {
-                const savedArtists = localStorage.getItem('loungeArtists');
-                return savedArtists ? JSON.parse(savedArtists) : [];
-            });
+            const [artists, setArtists] = useState([]);
             
             const [guestlist, setGuestlist] = useState(() => {
                 const savedGuestlist = localStorage.getItem('loungeGuestlist');
@@ -701,6 +719,7 @@
             const [newArtistRealName, setNewArtistRealName] = useState('');
             const [newArtistStageName, setNewArtistStageName] = useState('');
             const [newArtistContact, setNewArtistContact] = useState('');
+            const [newArtistSocial, setNewArtistSocial] = useState('');
             const [newGuestlistName, setNewGuestlistName] = useState('');
             const [newGuestlistOf, setNewGuestlistOf] = useState('');
             const [newGuestlistContact, setNewGuestlistContact] = useState('');
@@ -728,30 +747,126 @@
             const [editArtistRealName, setEditArtistRealName] = useState('');
             const [editArtistStageName, setEditArtistStageName] = useState('');
             const [editArtistContact, setEditArtistContact] = useState('');
+            const [editArtistSocial, setEditArtistSocial] = useState('');
             
-            // Load tasks for the current month and year
+            // Load tasks from localStorage
             useEffect(() => {
                 setIsLoading(true);
-                // Fetch tasks from the server for the current month/year
-                fetch(`/api/checklist?year=${currentYear}&month=${currentMonth}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        setTasks(data);
-                        setIsLoading(false);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching tasks:', error);
-                        setIsLoading(false);
-                        // Fallback to localStorage if server fails
-                        const savedTasks = localStorage.getItem('loungeChecklist');
-                        if (savedTasks) {
-                            setTasks(JSON.parse(savedTasks));
-                        }
-                    });
+                
+                // Load tasks from localStorage
+                const savedTasks = localStorage.getItem('loungeChecklist');
+                if (savedTasks) {
+                    try {
+                        const allTasks = JSON.parse(savedTasks);
+                        // Filter tasks by current month and year
+                        const filteredTasks = allTasks.filter(task => {
+                            if (!task.due_date) return true; // Include tasks without dates
+                            try {
+                                const taskDate = new Date(task.due_date);
+                                return !isNaN(taskDate) && 
+                                       taskDate.getMonth() + 1 === currentMonth && 
+                                       taskDate.getFullYear() === currentYear;
+                            } catch (e) {
+                                console.error('Error parsing task date:', e);
+                                return false;
+                            }
+                        });
+                        setTasks(filteredTasks);
+                    } catch (e) {
+                        console.error('Error parsing localStorage tasks:', e);
+                        setTasks([]);
+                    }
+                } else {
+                    setTasks([]);
+                }
+                setIsLoading(false);
             }, [currentMonth, currentYear]);
             
+            // Load artists from localStorage
             useEffect(() => {
-                localStorage.setItem('loungeArtists', JSON.stringify(artists));
+                // Load artists from localStorage
+                const savedArtists = localStorage.getItem('loungeArtists');
+                if (savedArtists) {
+                    try {
+                        const allArtists = JSON.parse(savedArtists);
+                        // Filter artists by current month (if they have showMonths)
+                        const filteredArtists = allArtists.filter(artist => {
+                            // If artist has no showMonths or empty array, always show
+                            if (!artist.showMonths || artist.showMonths.length === 0) return true;
+                            // Otherwise, check if current month is in their showMonths
+                            return artist.showMonths.includes(currentMonth);
+                        });
+                        setArtists(filteredArtists);
+                    } catch (e) {
+                        console.error('Error parsing localStorage artists:', e);
+                        setArtists([]);
+                    }
+                } else {
+                    setArtists([]);
+                }
+            }, [currentMonth]);
+            
+            // Save tasks to localStorage when they change
+            useEffect(() => {
+                // Don't save if tasks are empty and we're still loading
+                if (tasks.length === 0 && isLoading) return;
+                
+                try {
+                    // Get all tasks from localStorage first
+                    const savedTasks = localStorage.getItem('loungeChecklist');
+                    let allTasks = [];
+                    if (savedTasks) {
+                        try {
+                            allTasks = JSON.parse(savedTasks);
+                            // Filter out invalid tasks and remove current month/year tasks
+                            allTasks = allTasks.filter(task => {
+                                if (!task || !task.id) return false;
+                                
+                                if (!task.due_date) return true; // Keep tasks without dates
+                                try {
+                                    const taskDate = new Date(task.due_date);
+                                    return isNaN(taskDate) || 
+                                           taskDate.getMonth() + 1 !== currentMonth || 
+                                           taskDate.getFullYear() !== currentYear;
+                                } catch (e) {
+                                    return false;
+                                }
+                            });
+                        } catch (e) {
+                            console.error('Error parsing localStorage tasks:', e);
+                            allTasks = [];
+                        }
+                    }
+                    
+                    // Filter out tasks without IDs to prevent errors
+                    const validTasks = tasks.filter(task => task && task.id);
+                    
+                    // Add current tasks and save back to localStorage
+                    localStorage.setItem('loungeChecklist', JSON.stringify([...allTasks, ...validTasks]));
+                } catch (e) {
+                    console.error('Error saving tasks to localStorage:', e);
+                }
+            }, [tasks, currentMonth, currentYear, isLoading]);
+            
+            // Save artists to localStorage when they change
+            useEffect(() => {
+                // Get all artists from localStorage first
+                const savedArtists = localStorage.getItem('loungeArtists');
+                let allArtists = [];
+                if (savedArtists) {
+                    try {
+                        allArtists = JSON.parse(savedArtists);
+                        // Replace artists with the same ID
+                        allArtists = allArtists.filter(artist => 
+                            !artists.some(a => a.id === artist.id)
+                        );
+                    } catch (e) {
+                        console.error('Error parsing localStorage artists:', e);
+                    }
+                }
+                
+                // Add current artists and save back to localStorage
+                localStorage.setItem('loungeArtists', JSON.stringify([...allArtists, ...artists]));
             }, [artists]);
             
             useEffect(() => {
@@ -773,10 +888,10 @@
             }, [copyMessage]);
             
             const addTask = () => {
-                if (newTask.trim() === '' || !newDeadline) return;
+                if (newTask.trim() === '') return;
                 
                 const task = {
-                    id: Date.now(), // This will be replaced with server-generated ID
+                    id: Date.now(),
                     task: newTask,
                     due_date: newDeadline,
                     due_time: newTime,
@@ -785,81 +900,25 @@
                     month: currentMonth
                 };
                 
-                // Add task to the server
-                fetch('/api/checklist', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(task),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Update local state with the server response (which should include the DB-generated ID)
-                    setTasks(prevTasks => [...prevTasks, data]);
-                    setNewTask('');
-                    setNewDeadline('');
-                    setNewTime('09:00');
-                })
-                .catch(error => {
-                    console.error('Error adding task:', error);
-                    // Fallback to local state update if server fails
-                    setTasks(prevTasks => [...prevTasks, task]);
-                    setNewTask('');
-                    setNewDeadline('');
-                    setNewTime('09:00');
-                });
+                // Add task to state
+                setTasks(prevTasks => [...prevTasks, task]);
+                setNewTask('');
+                setNewDeadline('');
+                setNewTime('09:00');
             };
             
             const toggleComplete = (id) => {
-                // Find the task to toggle
-                const taskToUpdate = tasks.find(task => task.id === id);
-                if (!taskToUpdate) return;
-                
-                // Create updated task object
-                const updatedTask = { 
-                    ...taskToUpdate, 
-                    is_completed: !taskToUpdate.is_completed 
-                };
-                
-                // Update task on the server
-                fetch(`/api/checklist/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(updatedTask),
-                })
-                .then(response => response.json())
-                .then(() => {
-                    // Update local state
-                    setTasks(tasks.map(task => 
-                        task.id === id ? updatedTask : task
-                    ));
-                })
-                .catch(error => {
-                    console.error('Error updating task:', error);
-                    // Fallback to local state update if server fails
-                    setTasks(tasks.map(task => 
-                        task.id === id ? updatedTask : task
-                    ));
-                });
+                // Find the task to toggle and update
+                setTasks(tasks.map(task => 
+                    task.id === id 
+                        ? { ...task, is_completed: !task.is_completed } 
+                        : task
+                ));
             };
             
             const removeTask = (id) => {
-                // Delete task from server
-                fetch(`/api/checklist/${id}`, {
-                    method: 'DELETE',
-                })
-                .then(() => {
-                    // Update local state
-                    setTasks(tasks.filter(task => task.id !== id));
-                })
-                .catch(error => {
-                    console.error('Error deleting task:', error);
-                    // Fallback to local state update if server fails
-                    setTasks(tasks.filter(task => task.id !== id));
-                });
+                // Remove task from state
+                setTasks(tasks.filter(task => task.id !== id));
             };
             
             const startEditingTask = (task) => {
@@ -870,54 +929,25 @@
             };
             
             const saveEditedTask = () => {
-                if (editTaskText.trim() === '' || !editTaskDeadline) return;
+                if (editTaskText.trim() === '') return;
                 
-                // Find the task being edited
-                const taskToUpdate = tasks.find(task => task.id === editingTaskId);
-                if (!taskToUpdate) return;
+                // Update task in state
+                setTasks(tasks.map(task => 
+                    task.id === editingTaskId 
+                        ? { 
+                            ...task, 
+                            task: editTaskText,
+                            due_date: editTaskDeadline,
+                            due_time: editTaskTime
+                        } 
+                        : task
+                ));
                 
-                // Create updated task object
-                const updatedTask = {
-                    ...taskToUpdate,
-                    task: editTaskText,
-                    due_date: editTaskDeadline,
-                    due_time: editTaskTime
-                };
-                
-                // Update task on the server
-                fetch(`/api/checklist/${editingTaskId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(updatedTask),
-                })
-                .then(response => response.json())
-                .then(() => {
-                    // Update local state
-                    setTasks(tasks.map(task => 
-                        task.id === editingTaskId ? updatedTask : task
-                    ));
-                    
-                    // Reset editing state
-                    setEditingTaskId(null);
-                    setEditTaskText('');
-                    setEditTaskDeadline('');
-                    setEditTaskTime('');
-                })
-                .catch(error => {
-                    console.error('Error updating task:', error);
-                    // Fallback to local state update if server fails
-                    setTasks(tasks.map(task => 
-                        task.id === editingTaskId ? updatedTask : task
-                    ));
-                    
-                    // Reset editing state
-                    setEditingTaskId(null);
-                    setEditTaskText('');
-                    setEditTaskDeadline('');
-                    setEditTaskTime('');
-                });
+                // Reset edit state
+                setEditingTaskId(null);
+                setEditTaskText('');
+                setEditTaskDeadline('');
+                setEditTaskTime('');
             };
             
             const cancelEditing = () => {
@@ -950,38 +980,57 @@
             
             // Format date correctly without timezone issues
             const formatDeadlineDate = (dateString) => {
-                const [year, month, day] = dateString.split('-').map(Number);
-                // Create a date object using local time values to avoid timezone shift
-                const date = new Date(year, month - 1, day);
+                if (!dateString) return 'No date set';
                 
-                return date.toLocaleDateString('en-US', { 
-                    weekday: 'long',
-                    month: 'short', 
-                    day: 'numeric',
-                    year: 'numeric'
-                });
+                try {
+                    const [year, month, day] = dateString.split('-').map(Number);
+                    // Create a date object using local time values to avoid timezone shift
+                    const date = new Date(year, month - 1, day);
+                    
+                    // Check if date is valid
+                    if (isNaN(date.getTime())) {
+                        return 'Invalid date';
+                    }
+                    
+                    return date.toLocaleDateString('en-US', { 
+                        weekday: 'long',
+                        month: 'short', 
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                } catch (e) {
+                    console.error('Error formatting date:', e);
+                    return 'Invalid date format';
+                }
             };
             
             // Sort tasks by deadline (closest first)
-            const sortedTasks = [...tasks].sort((a, b) => {
-                // Create dates without timezone conversion issues
-                const dateFieldA = a.due_date || a.deadline;
-                const timeFieldA = a.due_time || a.time;
-                const dateFieldB = b.due_date || b.deadline;
-                const timeFieldB = b.due_time || b.time;
+            const sortedTasks = useMemo(() => {
+                const validTasks = [...tasks].filter(task => task && task.id);
                 
-                const [yearA, monthA, dayA] = dateFieldA.split('-').map(Number);
-                const [hoursA, minutesA] = timeFieldA.split(':').map(Number);
-                
-                const [yearB, monthB, dayB] = dateFieldB.split('-').map(Number);
-                const [hoursB, minutesB] = timeFieldB.split(':').map(Number);
-                
-                // Create date objects (months are 0-indexed in JS)
-                const dateA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA);
-                const dateB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB);
-                
-                return dateA - dateB;
-            });
+                return validTasks.sort((a, b) => {
+                    // Handle missing dates - items with no date will appear first
+                    if (!a.due_date && !b.due_date) return 0;
+                    if (!a.due_date) return -1;
+                    if (!b.due_date) return 1;
+                    
+                    try {
+                        // Create dates without timezone conversion issues
+                        const dateA = new Date(a.due_date + 'T' + (a.due_time || '09:00') + ':00');
+                        const dateB = new Date(b.due_date + 'T' + (b.due_time || '09:00') + ':00');
+                        
+                        // Check if valid dates
+                        if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+                            return 0;
+                        }
+                        
+                        return dateA - dateB;
+                    } catch (e) {
+                        console.error('Error sorting tasks:', e);
+                        return 0;
+                    }
+                });
+            }, [tasks]);
             
             // Function to format phone number
             const formatPhoneNumber = (phoneNumberString) => {
@@ -1024,13 +1073,19 @@
                     id: Date.now(),
                     realName: newArtistRealName,
                     stageName: newArtistStageName,
-                    contact: formattedContact
+                    contact: formattedContact,
+                    social: newArtistSocial,
+                    showMonths: [currentMonth]
                 };
                 
-                setArtists([...artists, artist]);
+                // Add artist to state
+                setArtists(prevArtists => [...prevArtists, artist]);
+                
+                // Clear the form
                 setNewArtistRealName('');
                 setNewArtistStageName('');
                 setNewArtistContact('');
+                setNewArtistSocial('');
             };
             
             const addGuestlist = () => {
@@ -1055,6 +1110,7 @@
             };
             
             const removeArtist = (id) => {
+                // Remove artist from state
                 setArtists(artists.filter(artist => artist.id !== id));
             };
             
@@ -1115,13 +1171,14 @@
                 if (includeArtistsInEmail && artists.length > 0) {
                     emailBody += '<h2>Artists</h2>';
                     emailBody += '<table border="1" cellpadding="5" style="border-collapse: collapse;">';
-                    emailBody += '<tr><th>Artist</th><th>Name</th><th>Contact</th></tr>';
+                    emailBody += '<tr><th>Artist</th><th>Name</th><th>Contact</th><th>Social</th></tr>';
                     
                     artists.forEach(artist => {
                         emailBody += '<tr>';
                         emailBody += `<td>${artist.stageName || 'N/A'}</td>`;
                         emailBody += `<td>${artist.realName || 'N/A'}</td>`;
                         emailBody += `<td>${artist.contact || 'N/A'}</td>`;
+                        emailBody += `<td>${artist.social ? '<a href="' + artist.social + '">Link</a>' : 'N/A'}</td>`;
                         emailBody += '</tr>';
                     });
                     
@@ -1212,6 +1269,7 @@
                 setEditArtistRealName(artist.realName);
                 setEditArtistStageName(artist.stageName);
                 setEditArtistContact(artist.contact);
+                setEditArtistSocial(artist.social || '');
             };
             
             const saveEditedArtist = () => {
@@ -1221,17 +1279,24 @@
                 const artistToUpdate = artists.find(artist => artist.id === editingArtistId);
                 if (!artistToUpdate) return;
                 
-                // Create updated artist object
-                const updatedArtist = {
-                    ...artistToUpdate,
-                    realName: editArtistRealName,
-                    stageName: editArtistStageName,
-                    contact: editArtistContact
-                };
+                // Get showMonths and add current month if not already included
+                const showMonths = [...(artistToUpdate.showMonths || [])];
+                if (!showMonths.includes(currentMonth)) {
+                    showMonths.push(currentMonth);
+                }
                 
-                // Update local state
+                // Update artist in state
                 setArtists(artists.map(artist => 
-                    artist.id === editingArtistId ? updatedArtist : artist
+                    artist.id === editingArtistId 
+                        ? {
+                            ...artist,
+                            realName: editArtistRealName,
+                            stageName: editArtistStageName,
+                            contact: editArtistContact,
+                            social: editArtistSocial,
+                            showMonths
+                        } 
+                        : artist
                 ));
                 
                 // Reset editing state
@@ -1239,6 +1304,7 @@
                 setEditArtistRealName('');
                 setEditArtistStageName('');
                 setEditArtistContact('');
+                setEditArtistSocial('');
             };
             
             const cancelEditingArtist = () => {
@@ -1246,6 +1312,7 @@
                 setEditArtistRealName('');
                 setEditArtistStageName('');
                 setEditArtistContact('');
+                setEditArtistSocial('');
             };
             
             return (
@@ -1305,9 +1372,17 @@
                                     />
                                     <input
                                         type="text"
-                                        placeholder="Contact Info (Phone Number Preferred)..."
+                                        placeholder="Phone Number..."
                                         value={newArtistContact}
                                         onChange={(e) => setNewArtistContact(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && addArtist()}
+                                        className="artist-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="(Optional) Social Media Link..."
+                                        value={newArtistSocial}
+                                        onChange={(e) => setNewArtistSocial(e.target.value)}
                                         onKeyDown={(e) => e.key === 'Enter' && addArtist()}
                                         className="artist-input"
                                     />
@@ -1343,6 +1418,13 @@
                                                             placeholder="Contact Info..."
                                                             value={editArtistContact}
                                                             onChange={(e) => setEditArtistContact(e.target.value)}
+                                                            className="artist-input"
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Social Media Link..."
+                                                            value={editArtistSocial}
+                                                            onChange={(e) => setEditArtistSocial(e.target.value)}
                                                             className="artist-input"
                                                         />
                                                         <div className="edit-actions">
@@ -1388,6 +1470,13 @@
                                                                     )}
                                                                 </div>
                                                             </div>
+                                                            {artist.social && (
+                                                                <div className="artist-social">
+                                                                    <a href={artist.social} target="_blank" rel="noopener noreferrer" className="social-link">
+                                                                        📱 Social Media
+                                                                    </a>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                         <div className="task-actions">
                                                             <button 
@@ -1656,7 +1745,7 @@
                                                         <div className="checkbox-container">
                                                             <input
                                                                 type="checkbox"
-                                                                checked={task.is_completed || task.completed}
+                                                                checked={task.is_completed || task.completed || false}
                                                                 onChange={() => toggleComplete(task.id)}
                                                                 id={`task-${task.id}`}
                                                             />
@@ -1664,7 +1753,7 @@
                                                                 htmlFor={`task-${task.id}`}
                                                                 className={(task.is_completed || task.completed) ? 'completed-text' : ''}
                                                             >
-                                                                {task.task || task.text}
+                                                                {task.task || task.text || 'Untitled Task'}
                                                             </label>
                                                         </div>
                                                         <div className="task-actions">
@@ -1685,7 +1774,10 @@
                                                         </div>
                                                     </div>
                                                     <div className="task-deadline">
-                                                        Deadline: {formatDeadlineDate(task.due_date || task.deadline)} at {formatTimeDisplay(task.due_time || task.time)}
+                                                        {task.due_date ? 
+                                                            `Deadline: ${formatDeadlineDate(task.due_date || task.deadline)} at ${formatTimeDisplay(task.due_time || task.time)}` :
+                                                            'No deadline set'
+                                                        }
                                                     </div>
                                                 </>
                                             )}
@@ -1702,7 +1794,7 @@
         };
         
         // Import React hooks
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
         
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
