@@ -71,8 +71,8 @@ function Artists() {
                                 </a>
                             )}
                         </div>
-                        <div className="artist-info">
-                            <div className="artist-name">{artist.name}</div>
+                        <div className="artist-profile-info">
+                            <div className="artist-profile-name">{artist.name}</div>
                             <div className="artist-description">{artist.description}</div>
                         </div>
                     </div>

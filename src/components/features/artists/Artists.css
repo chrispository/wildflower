@@ -17,6 +17,15 @@
     border: 1px solid var(--accent-color);
 }
 
+.artist-profile-name {
+    font-family: 'Major Mono Display', monospace !important;
+    text-transform: lowercase;
+    letter-spacing: 0.05em;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
 .artist-row.left {
     flex-direction: row;
 }
@@ -38,22 +47,13 @@
     margin-right: 20px;
 }
 
-.artist-info {
+.artist-profile-info {
     flex: 1;
-}
-
-.artist-name {
-    font-family: 'Major Mono Display', monospace !important;
-    text-transform: lowercase;
-    letter-spacing: 0.05em;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
 }
 
 .artist-description {
     margin-bottom: 10px;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.5;
     white-space: pre-line;
 }
