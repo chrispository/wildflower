@@ -56,7 +56,7 @@ export const artists = [
         description: "",
         image: "https://picsum.photos/seed/artist8/150",
     },
-
+ 
 ];
 
 
